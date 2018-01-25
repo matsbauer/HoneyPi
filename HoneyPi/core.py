@@ -6,22 +6,43 @@
 
 import json
 import os.path
+import socket
+
+try: input = raw_input
+except NameError: pass
 
 json_path = 'data/data_file_23125129ox7.json'
+
+def reload_ip(user):
+    print("Hey %s, I still need to know where you work. "%user)
+    if (input("Are you currently at work? Yes or no? ").lower() == "yes"):
+        data = json.load(open(json_path))
+        data["ip"] = socket.gethostbyname(socket.gethostname())
+        with open(json_path, 'w') as fp:
+            json.dump(data, fp)
+        
+    else:
+        print("Alright, I will ask again next time you start me.")
 
 def fill_json():
     d = {}
     print("Welcome to HoneyPi. To get started I need a few information about your honey. This data is safe with you right here!") 
     print("")
-    honey = raw_input("Would you like to tell me the name of your honey? ")
-    means = raw_input("How would you like to contact here, mail, telegram or sms? ")
-    contact = raw_input("Can you tell me here contact information for %s? " %means)
-    max_time = raw_input("When are you expected to leave work? (eg. 17:30)")
+    d['user']       =   input("What's your name? ")
+    d['honey']      =   input("Would you like to tell me the name of your honey? ")
+    means           =   input("How would you like to contact here, mail, telegram or sms? ")
+    contact         =   input("Can you tell me here contact information for %s? " %means)
+    d['max_time']   =   input("When are you expected to leave work? (eg. 17:30) ")
+    d['message']    =   input("Would you like to tell me how to tell your honey that you are sorry? ")
     
-    d['honey'] = honey
+    if (input("Are you currently at work? Yes or no? ").lower() == "yes"):
+        d['ip'] = socket.gethostbyname(socket.gethostname())
+    else:
+        print("Alright, I will ask again next time you start me.")
+        d['ip'] = "retry"
+        
     d['means'] = means.lower()
     d[means] = contact
-    d['max_time'] = max_time
     
     with open(json_path, 'w') as fp:
         json.dump(d, fp)
@@ -30,6 +51,8 @@ def fill_json():
 def open_datafile():
     if os.path.isfile(json_path) == True:
         data = json.load(open(json_path))
+        if data["ip"] == "retry":
+            reload_ip(data["user"])
         honey = data["honey"]
         contact = data[data["means"]]
         
