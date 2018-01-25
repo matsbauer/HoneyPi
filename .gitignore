@@ -9,6 +9,7 @@ __pycache__/
 #JSON
 
 .json
+.txxt
 
 # Distribution / packaging
 .Python

@@ -6,6 +6,8 @@
 
 import json
 
-
 if __name__ == "__main__":
-    print("nothing")
+    f = open('data.txxt','w')
+    a = input('is python good?')
+    f.write('answer:'+str(a))
+    f.close()
