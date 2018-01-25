@@ -8,8 +8,8 @@ __pycache__/
 
 #JSON
 
-.json
-.txxt
+*.json
+*.txxt
 
 # Distribution / packaging
 .Python
