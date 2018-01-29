@@ -10,6 +10,7 @@ import socket
 from threading import Thread
 import sys, re, time, sys
 from random import randint
+import codecs
 
 if sys.version_info >= (3, 0):
     from urllib.request import Request, urlopen
@@ -86,19 +87,27 @@ def notify():
     def send_it():
         print("sent")
         
+    data = json.load(open(json_path))
+    #response = Request('http://ipinfo.io/json', headers={'User-Agent': 'Mozilla/5.0'})
+    #response = urlopen(req).read()
+        
     response = urlopen('http://ipinfo.io/json')
 
     if sys.version_info >= (3, 0): #python3 has a string not byte conversion problem in json.load.
-        response = response.encode("utf-8") 
+        reader = codecs.getreader("utf-8")
+        loc = json.load(reader(response))
+    
+    else:
+        loc = json.load(response)
     
     #python3 response <http.client.HTTPResponse object at 0x7fdc7b20c940>
     #python2 reponse <addinfourl at 139895571535344 whose fp = <socket._fileobject object at 0x7f3bfa116ed0>>
     
-    loc = json.load(response)
+    #loc = json.load(response)
     current_ip = loc['ip']
     data = json.load(open(json_path))
     if(current_ip == data["ip"]):
-        print("I notified %s"%data["honey"])
+        print("I notified %s, as it appears that you are still at work."%data["honey"])
     else:
         if (input("Are you still at work? ").lower() == "yes"): 
             print("I notified %s"%data["honey"])
@@ -124,7 +133,7 @@ def notifier():
                     break
             
             else:
-                print("Time to wait - %s to go"%minutes)
+                print("Time to wait - %s minutes to go"%minutes)
                 time.sleep((minutes - 10)*60)
                 continue
         except KeyboardInterrupt:
